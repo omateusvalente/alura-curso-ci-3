@@ -9,11 +9,11 @@ jobs:
     runs-on: ubuntu-latest
     steps: 
       - name: Download a Build Artifact
-        uses: actions/download-artifact@v3.0.0
+        uses: actions/download-artifact@v5.0.0
         with:
         # Artifact name
-          name: programa
-      - uses: actions/checkout@v3
+          name: api.go
+      - uses: actions/checkout@v5.0.0
       
       - name: Deploy to Staging server
         uses: easingthemes/ssh-deploy@main
@@ -23,3 +23,18 @@ jobs:
           REMOTE_USER: ${{ secrets.REMOTE_USER }}
           TARGET: /home/${{ secrets.REMOTE_USER }}
           EXCLUDE: "postgres-data"
+
+      - name: Execute remote SSH commands using password
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.REMOTE_HOST }}
+          username: ${{ secrets.REMOTE_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: 22
+          script: |
+            export HOST=${{ secrets.DB_HOST }} 
+            export USER=${{ secrets.DB_USER }}
+            export PASSWORD=${{ secrets.DB_PASSWORD }}
+            export DBNAME=${{ secrets.DB_NAME }}
+            export PORT=${{ secrets.DB_PORT }}
+            export port=8000
